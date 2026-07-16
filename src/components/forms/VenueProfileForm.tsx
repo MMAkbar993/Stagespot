@@ -2,14 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { FieldLabel, FieldInput, CheckboxRow } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
+import type { VenueProfile } from "@/lib/types";
 
 export function VenueProfileForm({
-  submitLabel = "Submit for verification",
+  mode = "create",
+  initialValues,
+  submitLabel,
+  redirectTo = "/home",
 }: {
+  mode?: "create" | "edit";
+  initialValues?: VenueProfile;
   submitLabel?: string;
+  redirectTo?: string;
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -17,72 +23,89 @@ export function VenueProfileForm({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // e.currentTarget goes null after the first await (React nulls out
+    // SyntheticEvent fields once the synchronous dispatch phase ends), so
+    // capture the form here before any awaited call.
+    const formEl = e.currentTarget;
     setError(null);
     setLoading(true);
 
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setLoading(false);
-      setError("You must be logged in.");
-      return;
-    }
-
-    const form = new FormData(e.currentTarget);
-    const actTypesWanted = form.get("act_types_wanted") as string;
-    const socialLink = form.get("social_link") as string;
-    const proofLink = form.get("proof_of_business_link") as string;
+    const form = new FormData(formEl);
     const photos = ["photo_1", "photo_2", "photo_3"]
       .map((name) => form.get(name) as string)
-      .filter(Boolean)
-      .map((url) => ({ url }));
+      .filter(Boolean);
 
-    // lat/lng are geocoded server-side from `address` in a later build phase.
-    const { error } = await supabase.from("venue_profiles").insert({
-      user_id: user.id,
-      venue_name: form.get("venue_name"),
-      address: form.get("address"),
-      act_types_wanted: actTypesWanted ? [actTypesWanted] : [],
-      photos,
-      social_links: socialLink ? { primary: socialLink } : {},
-      first_time_hosting: form.get("first_time_hosting") === "on",
-      proof_of_business_links: proofLink ? [{ url: proofLink }] : [],
+    const res = await fetch("/api/venue-profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mode,
+        venue_name: form.get("venue_name"),
+        address: form.get("address"),
+        act_types_wanted: form.get("act_types_wanted"),
+        photos,
+        social_link: form.get("social_link"),
+        first_time_hosting: form.get("first_time_hosting") === "on",
+        proof_of_business_link: form.get("proof_of_business_link"),
+      }),
     });
 
     setLoading(false);
-    if (error) {
-      setError(error.message);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Something went wrong.");
       return;
     }
-    router.push("/home");
+    router.push(redirectTo);
     router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <FieldLabel>Venue name</FieldLabel>
-      <FieldInput name="venue_name" placeholder="Cafe or restaurant name" required />
+      <FieldInput
+        name="venue_name"
+        placeholder="Cafe or restaurant name"
+        defaultValue={initialValues?.venue_name}
+        required
+      />
       <FieldLabel>Full address</FieldLabel>
-      <FieldInput name="address" placeholder="Street, locality, city" required />
+      <FieldInput
+        name="address"
+        placeholder="Street, locality, city"
+        defaultValue={initialValues?.address}
+        required
+      />
       <FieldLabel>Act types wanted</FieldLabel>
-      <FieldInput name="act_types_wanted" placeholder="Music / comedy / poetry / other" />
+      <FieldInput
+        name="act_types_wanted"
+        placeholder="Music / comedy / poetry / other"
+        defaultValue={initialValues?.act_types_wanted?.[0]}
+      />
       <FieldLabel>Venue photo links</FieldLabel>
       <div className="space-y-1.5">
-        <FieldInput name="photo_1" placeholder="Link to a photo" />
-        <FieldInput name="photo_2" placeholder="Link to a photo" />
-        <FieldInput name="photo_3" placeholder="Link to a photo" />
+        <FieldInput name="photo_1" placeholder="Link to a photo" defaultValue={initialValues?.photos?.[0]?.url} />
+        <FieldInput name="photo_2" placeholder="Link to a photo" defaultValue={initialValues?.photos?.[1]?.url} />
+        <FieldInput name="photo_3" placeholder="Link to a photo" defaultValue={initialValues?.photos?.[2]?.url} />
       </div>
       <FieldLabel>Social media link</FieldLabel>
-      <FieldInput name="social_link" placeholder="instagram.com/..." />
-      <CheckboxRow name="first_time_hosting">First time hosting</CheckboxRow>
+      <FieldInput
+        name="social_link"
+        placeholder="instagram.com/..."
+        defaultValue={initialValues?.social_links?.primary}
+      />
+      <CheckboxRow name="first_time_hosting" defaultChecked={initialValues?.first_time_hosting ?? false}>
+        First time hosting
+      </CheckboxRow>
       <FieldLabel>Proof of business link</FieldLabel>
-      <FieldInput name="proof_of_business_link" placeholder="Registration or listing link" />
+      <FieldInput
+        name="proof_of_business_link"
+        placeholder="Registration or listing link"
+        defaultValue={initialValues?.proof_of_business_links?.[0]?.url}
+      />
       {error && <p className="mt-3 text-xs text-red-600">{error}</p>}
       <Button type="submit" block className="mt-5" disabled={loading}>
-        {loading ? "Saving…" : submitLabel}
+        {loading ? "Saving…" : submitLabel ?? (mode === "edit" ? "Save changes" : "Submit for verification")}
       </Button>
     </form>
   );
