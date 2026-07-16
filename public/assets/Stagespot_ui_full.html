@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>StageSpot: Full UI Mockups</title>
+<style>
+  :root {
+    --bg: #FAF8F5;
+    --surface: #FFFFFF;
+    --text: #1C1B19;
+    --text-2: #6B6862;
+    --text-3: #9B9790;
+    --border: #EAE6DE;
+    --accent: #A8763F;
+    --accent-soft: #F3E7D6;
+    --accent-text: #7A5527;
+    --verified-soft: #E9EEE4;
+    --verified-text: #3F5E33;
+    --pending-soft: #F6EFE1;
+    --pending-text: #8A6A2E;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    background: #EDEAE3;
+    margin: 0;
+    padding: 32px 20px 60px;
+    color: var(--text);
+  }
+  h1 { text-align: center; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .sub { text-align: center; font-size: 12.5px; color: var(--text-2); margin-bottom: 30px; }
+  .group-title {
+    max-width: 1300px; margin: 44px auto 16px; font-size: 13px; font-weight: 600;
+    color: var(--text-2); text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid #DAD5C9; padding-bottom: 8px;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; max-width: 1300px; margin: 0 auto; }
+  .frame-wrap { text-align: center; }
+  .frame-label { font-size: 11.5px; font-weight: 600; color: var(--text-2); margin-bottom: 10px; letter-spacing: 0.02em; text-transform: uppercase; }
+  .phone { width: 300px; height: 620px; background: var(--bg); border-radius: 40px; border: 1px solid #D8D3C8; box-shadow: 0 20px 40px rgba(28,27,25,0.12); position: relative; overflow: hidden; }
+  .island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 84px; height: 22px; background: #111; border-radius: 14px; z-index: 20; }
+  .screen { position: absolute; inset: 0; padding-top: 42px; display: flex; flex-direction: column; height: 100%; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 18px 12px; }
+  .topbar .title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .topbar .back { font-size: 18px; color: var(--text); }
+  .topbar .action { font-size: 12px; font-weight: 600; color: var(--accent-text); }
+  .avatar-btn { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#D9C3A0,#A8763F); border: 1.5px solid var(--surface); box-shadow: 0 0 0 1px var(--border); }
+  .content { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Segmented control (filter) */
+  .segmented { display: flex; background: #F0ECE3; border-radius: 10px; padding: 3px; margin: 0 0 12px; }
+  .seg { flex: 1; text-align: center; padding: 7px; border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-2); }
+  .seg.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(28,27,25,0.1); }
+
+  /* Feed card */
+  .feed-card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 14px; overflow: hidden; }
+  .feed-card .card-top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
+  .card-avatar { width: 28px; height: 28px; border-radius: 50%; background: #DCD5C6; flex-shrink:0; }
+  .card-name { font-size: 12.5px; font-weight: 600; }
+  .card-meta { font-size: 10.5px; color: var(--text-2); }
+  .verified-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--verified-soft); display:inline-flex; align-items:center; justify-content:center; }
+  .verified-dot svg { width: 8px; height: 8px; }
+  .card-img { height: 140px; background: linear-gradient(135deg,#EFE7D8,#DDD2BB); }
+  .card-body { padding: 10px 12px 12px; }
+  .card-title { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; }
+  .card-sub { font-size: 11px; color: var(--text-2); margin-bottom: 10px; }
+  .card-actions { display: flex; gap: 8px; }
+  .btn-primary { flex: 1; text-align: center; padding: 8px; background: var(--text); color: #FFF; border-radius: 10px; font-size: 11.5px; font-weight: 600; }
+  .btn-ghost { padding: 8px 12px; text-align: center; border: 1px solid var(--border); border-radius: 10px; font-size: 11.5px; color: var(--text-2); }
+  .btn-block { width: 100%; }
+
+  /* Masonry */
+  .masonry { column-count: 2; column-gap: 10px; }
+  .m-card { break-inside: avoid; margin-bottom: 10px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+  .m-img { background: linear-gradient(160deg,#EFE7D8,#D9C9A8); }
+  .m-body { padding: 8px 9px 10px; }
+  .m-name { font-size: 11px; font-weight: 600; }
+  .m-chip { display: inline-flex; align-items: center; gap: 3px; font-size: 9.5px; color: var(--accent-text); background: var(--accent-soft); padding: 2px 7px; border-radius: 8px; margin-top: 4px; }
+
+  /* FAB */
+  .fab { position: absolute; right: 16px; bottom: 84px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(168,118,63,0.4); z-index: 15; }
+  .fab svg { width: 20px; height: 20px; }
+
+  /* Tab bar */
+  .tabbar { display: flex; border-top: 1px solid var(--border); background: rgba(250,248,245,0.92); padding: 10px 0 14px; }
+  .tab { flex: 1; text-align: center; }
+  .tab-icon { font-size: 18px; margin-bottom: 2px; display:block; }
+  .tab-label { font-size: 10px; font-weight: 500; }
+  .tab.active .tab-icon, .tab.active .tab-label { color: var(--accent); }
+  .tab:not(.active) .tab-icon, .tab:not(.active) .tab-label { color: var(--text-3); }
+
+  /* Profile */
+  .profile-head { text-align: center; padding: 4px 20px 14px; }
+  .profile-avatar { width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg,#D9C3A0,#A8763F); margin: 0 auto 10px; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--border); }
+  .profile-name { font-size: 16px; font-weight: 600; }
+  .profile-id { font-size: 11px; color: var(--text-3); margin: 2px 0 10px; }
+  .badge-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 12px; }
+  .badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 8px; }
+  .badge.verified { background: var(--verified-soft); color: var(--verified-text); }
+  .stat-row { display: flex; justify-content: center; gap: 24px; padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 15px; font-weight: 600; }
+  .stat-label { font-size: 9.5px; color: var(--text-2); }
+  .bio-text { font-size: 12px; color: var(--text-2); line-height: 1.5; text-align:center; margin-bottom: 16px; padding: 0 8px; }
+  .icon-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; }
+  .icon-pill { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.03em; margin: 4px 0 8px; }
+  .perf-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .review-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+  .review-text { font-size: 11.5px; color: var(--text); margin-bottom: 3px; }
+  .review-author { font-size: 10px; color: var(--text-3); }
+
+  /* Sheet */
+  .sheet-overlay { position: absolute; inset: 0; background: rgba(28,27,25,0.35); display: flex; align-items: flex-end; z-index: 30; }
+  .sheet { width: 100%; background: var(--surface); border-radius: 22px 22px 0 0; padding: 10px 18px 24px; }
+  .sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 16px; }
+  .sheet-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .sheet-sub { font-size: 11.5px; color: var(--text-2); margin-bottom: 14px; }
+  .sheet-input { border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 11.5px; color: var(--text-2); background: var(--bg); margin-bottom: 12px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .chip { font-size: 10.5px; font-weight: 500; color: var(--accent-text); background: var(--accent-soft); padding: 5px 10px; border-radius: 10px; }
+
+  /* Forms */
+  .field-label { font-size: 11px; color: var(--text-2); font-weight: 500; margin: 12px 0 5px; }
+  .field-input { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--text-3); background: var(--surface); }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text); margin: 14px 0 4px; }
+  .checkbox { width: 15px; height: 15px; border: 1.5px solid var(--border); border-radius: 4px; }
+  .img-slot { border-radius: 10px; background: linear-gradient(160deg,#EFE7D8,#D9C9A8); }
+
+  /* Lists (bookings, admin) */
+  .list-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+  .list-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .list-title { font-size: 12.5px; font-weight: 600; }
+  .status-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 8px; }
+  .status-pending { background: var(--pending-soft); color: var(--pending-text); }
+  .status-accepted { background: var(--accent-soft); color: var(--accent-text); }
+  .status-done { background: var(--verified-soft); color: var(--verified-text); }
+
+  /* Landing */
+  .hero-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 8px; }
+  .hero-sub { font-size: 12.5px; color: var(--text-2); line-height: 1.5; margin-bottom: 18px; }
+  .stat-mini-row { display: flex; gap: 10px; margin: 18px 0; }
+  .stat-mini { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; }
+  .stat-mini .num { font-size: 14px; font-weight: 700; color: var(--accent-text); }
+  .stat-mini .lbl { font-size: 9px; color: var(--text-2); }
+
+  /* Admin */
+  .admin-stat-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .admin-stat { flex: 1; background: var(--surface); border-radius: 12px; padding: 10px; border: 1px solid var(--border); }
+  .admin-stat .num { font-size: 16px; font-weight: 700; }
+  .admin-stat .lbl { font-size: 9.5px; color: var(--text-2); }
+</style>
+</head>
+<body>
+
+<h1>StageSpot: full screen set</h1>
+<div class="sub">Warm neutral palette, two-tab navigation, floating AI search, Apple / Pinterest / Instagram influence</div>
+
+<div class="group-title">Before sign in</div>
+<div class="row">
+
+  <!-- LANDING -->
+  <div class="frame-wrap">
+    <div class="frame-label">Landing page</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="title" style="font-size:16px;">StageSpot</span><span class="card-meta">Log in</span></div>
+        <div class="content">
+          <div class="hero-title">Get your first stage</div>
+          <div class="hero-sub">Find a cafe to perform at, or find a performer for your venue. Built for first timers, hyperlocal to your city.</div>
+          <div class="segmented">
+            <div class="seg active">I'm a performer</div>
+            <div class="seg">I'm a venue</div>
+          </div>
+          <div class="btn-primary btn-block">Continue</div>
+          <div class="stat-mini-row">
+            <div class="stat-mini"><div class="num">120+</div><div class="lbl">verified acts</div></div>
+            <div class="stat-mini"><div class="num">40+</div><div class="lbl">venues</div></div>
+          </div>
+          <div class="section-label">This week nearby</div>
+          <div class="masonry">
+            <div class="m-card"><div class="m-img" style="height:100px;"></div><div class="m-body"><div class="m-name">The Wren Cafe</div><div class="m-chip">Fri, 7pm</div></div></div>
+            <div class="m-card"><div class="m-img" style="height:130px;"></div><div class="m-body"><div class="m-name">Meher Rao</div><div class="m-chip">poetry</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGN UP -->
+  <div class="frame-wrap">
+    <div class="frame-label">Sign up</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span class="title" style="font-size:16px;">Create account</span><span></span></div>
+        <div class="content">
+          <div class="field-label">I am a</div>
+          <div class="segmented"><div class="seg active">Performer</div><div class="seg">Venue</div></div>
+          <div class="field-label">Email</div>
+          <div class="field-input">name@email.com</div>
+          <div class="field-label">Password</div>
+          <div class="field-input">********</div>
+          <div class="btn-primary btn-block" style="margin-top:20px;">Create account</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="frame-wrap">
+    <div class="frame-label">Login</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span class="title" style="font-size:16px;">Log in</span><span></span></div>
+        <div class="content">
+          <div class="field-label">Email</div>
+          <div class="field-input">name@email.com</div>
+          <div class="field-label">Password</div>
+          <div class="field-input">********</div>
+          <div class="card-meta" style="color:var(--accent-text);font-weight:600;margin-top:10px;">Forgot password?</div>
+          <div class="btn-primary btn-block" style="margin-top:16px;">Log in</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL VERIFY -->
+  <div class="frame-wrap">
+    <div class="frame-label">Email verification</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span></span><span class="title" style="font-size:16px;">Verify email</span><span></span></div>
+        <div class="content" style="text-align:center;padding-top:30px;">
+          <div class="profile-avatar" style="background:var(--accent-soft);"></div>
+          <div class="profile-name" style="margin-top:10px;">Check your inbox</div>
+          <div class="bio-text">We sent a verification link to your email. Click it to activate your account.</div>
+          <div class="btn-ghost btn-block">Resend email</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="group-title">Profile setup</div>
+<div class="row">
+
+  <!-- PERFORMER SETUP -->
+  <div class="frame-wrap">
+    <div class="frame-label">Performer setup</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span class="title" style="font-size:16px;">Your profile</span><span></span></div>
+        <div class="content">
+          <div class="profile-avatar" style="margin:0 auto 8px;width:60px;height:60px;"></div>
+          <div class="field-label">Name</div><div class="field-input">Your name</div>
+          <div class="field-label">Act type</div><div class="field-input">Music / comedy / poetry / other</div>
+          <div class="field-label">Bio</div><div class="field-input">Short bio</div>
+          <div class="field-label">Social media link</div><div class="field-input">instagram.com/...</div>
+          <div class="field-label">Portfolio link</div><div class="field-input">youtube.com/...</div>
+          <div class="checkbox-row"><div class="checkbox"></div>First time performing</div>
+          <div class="field-label">Proof of work link</div><div class="field-input">link to a video or page</div>
+          <div class="btn-primary btn-block" style="margin-top:16px;">Submit for verification</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENUE SETUP -->
+  <div class="frame-wrap">
+    <div class="frame-label">Venue setup</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span class="title" style="font-size:16px;">Venue profile</span><span></span></div>
+        <div class="content">
+          <div class="field-label">Venue name</div><div class="field-input">Cafe or restaurant name</div>
+          <div class="field-label">Full address</div><div class="field-input">Street, locality, city</div>
+          <div class="field-label">Act types wanted</div><div class="field-input">Music / comedy / poetry / other</div>
+          <div class="field-label">Venue photos</div>
+          <div style="display:flex;gap:6px;">
+            <div class="img-slot" style="width:60px;height:44px;"></div>
+            <div class="img-slot" style="width:60px;height:44px;"></div>
+            <div class="img-slot" style="width:60px;height:44px;"></div>
+          </div>
+          <div class="field-label">Social media link</div><div class="field-input">instagram.com/...</div>
+          <div class="checkbox-row"><div class="checkbox"></div>First time hosting</div>
+          <div class="field-label">Proof of business link</div><div class="field-input">registration or listing link</div>
+          <div class="btn-primary btn-block" style="margin-top:16px;">Submit for verification</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST A GIG -->
+  <div class="frame-wrap">
+    <div class="frame-label">Post a gig</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span class="title" style="font-size:16px;">Post a gig</span><span></span></div>
+        <div class="content">
+          <div class="field-label">Date</div><div class="field-input">Select a date</div>
+          <div class="field-label">Time window</div><div class="field-input">e.g. 7pm to 9pm</div>
+          <div class="field-label">Act type needed</div><div class="field-input">Music / comedy / poetry / other</div>
+          <div class="field-label">Notes</div><div class="field-input">Mic available, indoor or outdoor</div>
+          <div class="btn-primary btn-block" style="margin-top:16px;">Post gig</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="group-title">Main app</div>
+<div class="row">
+
+  <!-- HOME -->
+  <div class="frame-wrap">
+    <div class="frame-label">Home</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="title">Home</span><div class="avatar-btn"></div></div>
+        <div class="content">
+          <div class="segmented">
+            <div class="seg active">Performers</div>
+            <div class="seg">Gigs</div>
+          </div>
+          <div class="feed-card">
+            <div class="card-top">
+              <div class="card-avatar"></div>
+              <div style="flex:1;"><span class="card-name">Aanya Kapoor</span><span class="verified-dot"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#3F5E33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="card-meta">Acoustic &middot; 1.2 km away</div></div>
+            </div>
+            <div class="card-img"></div>
+            <div class="card-body">
+              <div class="card-title">Looking for a Friday slot</div>
+              <div class="card-sub">First time performing &middot; open to any cafe</div>
+              <div class="card-actions"><div class="btn-primary">Invite</div><div class="btn-ghost">View</div></div>
+            </div>
+          </div>
+          <div class="feed-card">
+            <div class="card-top">
+              <div class="card-avatar"></div>
+              <div style="flex:1;"><span class="card-name">The Wren Cafe</span><span class="verified-dot"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#3F5E33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="card-meta">Delhi region</div></div>
+            </div>
+            <div class="card-img"></div>
+            <div class="card-body">
+              <div class="card-title">Open mic, Saturday 7pm</div>
+              <div class="card-sub">Looking for acoustic or spoken word</div>
+              <div class="card-actions"><div class="btn-primary">Apply</div><div class="btn-ghost">View</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4L12 2z" fill="#FFF"/></svg></div>
+        <div class="tabbar"><div class="tab active"><span class="tab-icon">&#9679;</span><span class="tab-label">Home</span></div><div class="tab"><span class="tab-icon">&#9634;</span><span class="tab-label">Explore</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLORE with filter -->
+  <div class="frame-wrap">
+    <div class="frame-label">Explore, with filter</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="title">Explore</span><div class="avatar-btn"></div></div>
+        <div class="content">
+          <div class="segmented">
+            <div class="seg active">Performers</div>
+            <div class="seg">Gigs</div>
+          </div>
+          <div class="masonry">
+            <div class="m-card"><div class="m-img" style="height:110px;"></div><div class="m-body"><div class="m-name">Kabir Sen</div><div class="m-chip">&#9733; 4.9 comedy</div></div></div>
+            <div class="m-card"><div class="m-img" style="height:150px;"></div><div class="m-body"><div class="m-name">Meher Rao</div><div class="m-chip">&#9733; 5.0 poetry</div></div></div>
+            <div class="m-card"><div class="m-img" style="height:120px;"></div><div class="m-body"><div class="m-name">Ishaan Vora</div><div class="m-chip">first stage</div></div></div>
+            <div class="m-card"><div class="m-img" style="height:95px;"></div><div class="m-body"><div class="m-name">Riya Malhotra</div><div class="m-chip">&#9733; 4.7 music</div></div></div>
+          </div>
+        </div>
+        <div class="fab"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4L12 2z" fill="#FFF"/></svg></div>
+        <div class="tabbar"><div class="tab"><span class="tab-icon">&#9679;</span><span class="tab-label">Home</span></div><div class="tab active"><span class="tab-icon">&#9634;</span><span class="tab-label">Explore</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLORE venue filter -->
+  <div class="frame-wrap">
+    <div class="frame-label">Explore, venue view</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="title">Explore</span><div class="avatar-btn"></div></div>
+        <div class="content">
+          <div class="segmented">
+            <div class="seg">Performers</div>
+            <div class="seg active">Gigs</div>
+          </div>
+          <div class="masonry">
+            <div class="m-card"><div class="m-img" style="height:100px;"></div><div class="m-body"><div class="m-name">The Wren Cafe</div><div class="m-chip">Fri, 7pm</div></div></div>
+            <div class="m-card"><div class="m-img" style="height:130px;"></div><div class="m-body"><div class="m-name">Brew &amp; Verse</div><div class="m-chip">Sat, 6pm</div></div></div>
+            <div class="m-card"><div class="m-img" style="height:110px;"></div><div class="m-body"><div class="m-name">Late Hour Cafe</div><div class="m-chip">Sun, 8pm</div></div></div>
+          </div>
+        </div>
+        <div class="fab"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4L12 2z" fill="#FFF"/></svg></div>
+        <div class="tabbar"><div class="tab"><span class="tab-icon">&#9679;</span><span class="tab-label">Home</span></div><div class="tab active"><span class="tab-icon">&#9634;</span><span class="tab-label">Explore</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI SHEET -->
+  <div class="frame-wrap">
+    <div class="frame-label">AI search, from FAB</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="title">Explore</span><div class="avatar-btn"></div></div>
+        <div class="content">
+          <div class="segmented"><div class="seg active">Performers</div><div class="seg">Gigs</div></div>
+          <div class="masonry">
+            <div class="m-card"><div class="m-img" style="height:110px;"></div><div class="m-body"><div class="m-name">Kabir Sen</div><div class="m-chip">&#9733; 4.9 comedy</div></div></div>
+          </div>
+        </div>
+        <div class="sheet-overlay">
+          <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Describe what you want</div>
+            <div class="sheet-sub">Not sure how to search? Tell us the vibe.</div>
+            <div class="sheet-input">"Moody, acoustic, late-night energy"</div>
+            <div class="chip-row"><span class="chip">acoustic</span><span class="chip">low-tempo</span><span class="chip">singer-songwriter</span></div>
+            <div class="btn-primary btn-block">Show matching performers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GIG DETAIL -->
+  <div class="frame-wrap">
+    <div class="frame-label">Gig detail</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span></span><span></span></div>
+        <div class="content">
+          <div class="card-img" style="border-radius:14px;height:150px;margin-bottom:12px;"></div>
+          <div class="profile-name" style="font-size:16px;">The Wren Cafe</div>
+          <div class="card-meta" style="margin-bottom:10px;">Delhi region &middot; exact address after confirming</div>
+          <div class="card-sub" style="margin-bottom:14px;">Friday, 7pm to 9pm &middot; acoustic music</div>
+          <div class="section-label">About this venue</div>
+          <div class="bio-text" style="text-align:left;padding:0;">Small, warm space with a corner stage. Mic and amp available.</div>
+          <div class="btn-primary btn-block" style="margin-top:10px;">Request to perform</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY BOOKINGS -->
+  <div class="frame-wrap">
+    <div class="frame-label">My bookings</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="title">My bookings</span><div class="avatar-btn"></div></div>
+        <div class="content">
+          <div class="list-card"><div class="list-top"><span class="list-title">The Wren Cafe, Fri 7pm</span><span class="status-pill status-pending">Requested</span></div><div class="card-meta">Sent 2 days ago</div></div>
+          <div class="list-card"><div class="list-top"><span class="list-title">Brew &amp; Verse, Sat 6pm</span><span class="status-pill status-accepted">Accepted</span></div><div class="card-meta">Awaiting confirmation</div></div>
+          <div class="list-card"><div class="list-top"><span class="list-title">Late Hour Cafe, last week</span><span class="status-pill status-done">Completed</span></div><div class="card-meta">Leave feedback</div></div>
+        </div>
+        <div class="tabbar"><div class="tab active"><span class="tab-icon">&#9679;</span><span class="tab-label">Home</span></div><div class="tab"><span class="tab-icon">&#9634;</span><span class="tab-label">Explore</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKING CONFIRMATION -->
+  <div class="frame-wrap">
+    <div class="frame-label">Booking confirmed</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span></span><span></span></div>
+        <div class="content" style="text-align:center;padding-top:16px;">
+          <div class="icon-pill" style="width:52px;height:52px;margin:0 auto 12px;background:var(--verified-soft);border:none;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#3F5E33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="profile-name">Booking confirmed</div>
+          <div class="bio-text">Both sides are locked in. Full details below.</div>
+          <div style="text-align:left;">
+            <div class="field-label">Venue</div><div class="field-input">The Wren Cafe, full address in Delhi region</div>
+            <div class="field-label">Date and time</div><div class="field-input">Friday, 7pm to 9pm</div>
+            <div class="field-label">Contact</div><div class="field-input">+91 98xxxxxxx now visible</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK -->
+  <div class="frame-wrap">
+    <div class="frame-label">Feedback and rating</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span class="title" style="font-size:16px;">Rate your show</span><span></span></div>
+        <div class="content">
+          <div style="text-align:center;font-size:24px;color:var(--accent-text);margin:10px 0;">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
+          <div class="field-label">Comment</div><div class="field-input">Share how it went</div>
+          <div class="field-label">Tags</div>
+          <div class="chip-row"><span class="chip">respectful</span><span class="chip">followed through</span><span class="chip">would work with again</span></div>
+          <div class="btn-primary btn-block" style="margin-top:10px;">Submit feedback</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="group-title">Profiles and admin</div>
+<div class="row">
+
+  <!-- PERFORMER PROFILE (fixed, one rating) -->
+  <div class="frame-wrap">
+    <div class="frame-label">Performer profile</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span></span><span class="action">Edit</span></div>
+        <div class="content">
+          <div class="profile-head">
+            <div class="profile-avatar"></div>
+            <div class="profile-name">Aanya Kapoor</div>
+            <div class="profile-id">Performer &middot; ID P-1042</div>
+            <div class="badge-row"><span class="badge verified">Verified</span></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">4.8</div><div class="stat-label">rating</div></div>
+            <div class="stat"><div class="stat-num">12</div><div class="stat-label">performances</div></div>
+            <div class="stat"><div class="stat-num">3</div><div class="stat-label">worked with</div></div>
+          </div>
+          <div class="bio-text">Acoustic singer-songwriter based in the Delhi region. Started performing this year, mostly covers with a few originals.</div>
+          <div class="icon-row">
+            <div class="icon-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#6B6862" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="#6B6862" stroke-width="1.6"/></svg></div>
+            <div class="icon-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4l16 8-16 8V4z" stroke="#6B6862" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+            <div class="icon-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="#6B6862" stroke-width="1.6"/><path d="M4 15l4-4 4 4 5-6 3 3" stroke="#6B6862" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="section-label">Recent performances</div>
+          <div class="perf-row"><span>The Wren Cafe</span><span class="card-meta">Jun 14</span></div>
+          <div class="perf-row"><span>Late Hour Cafe</span><span class="card-meta">May 28</span></div>
+          <div class="section-label" style="margin-top:14px;">Reviews</div>
+          <div class="review-card"><div class="review-text">"Great energy, showed up early."</div><div class="review-author">The Wren Cafe</div></div>
+          <div class="review-card"><div class="review-text">"Would book again in a heartbeat."</div><div class="review-author">Late Hour Cafe</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENUE PROFILE -->
+  <div class="frame-wrap">
+    <div class="frame-label">Venue profile</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span></span><span class="action">Edit</span></div>
+        <div class="content">
+          <div class="profile-head">
+            <div class="profile-avatar"></div>
+            <div class="profile-name">The Wren Cafe</div>
+            <div class="profile-id">Venue &middot; ID V-2087</div>
+            <div class="badge-row"><span class="badge verified">Verified</span></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">4.6</div><div class="stat-label">rating</div></div>
+            <div class="stat"><div class="stat-num">21</div><div class="stat-label">gigs hosted</div></div>
+            <div class="stat"><div class="stat-num">5</div><div class="stat-label">worked with</div></div>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:16px;">
+            <div class="img-slot" style="flex:1;height:56px;"></div>
+            <div class="img-slot" style="flex:1;height:56px;"></div>
+            <div class="img-slot" style="flex:1;height:56px;"></div>
+          </div>
+          <div class="section-label">Past gigs hosted</div>
+          <div class="perf-row"><span>Aanya Kapoor</span><span class="card-meta">Jun 14</span></div>
+          <div class="perf-row"><span>Kabir Sen</span><span class="card-meta">May 30</span></div>
+          <div class="section-label" style="margin-top:14px;">Reviews</div>
+          <div class="review-card"><div class="review-text">"Welcoming space, good crowd."</div><div class="review-author">Kabir Sen</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div class="frame-wrap">
+    <div class="frame-label">Admin dashboard</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="title">Admin</span><div class="avatar-btn"></div></div>
+        <div class="content">
+          <div class="admin-stat-row">
+            <div class="admin-stat"><div class="num">12</div><div class="lbl">pending</div></div>
+            <div class="admin-stat"><div class="num">34</div><div class="lbl">active gigs</div></div>
+          </div>
+          <div class="section-label">Verification queue</div>
+          <div class="list-card">
+            <div class="list-top"><span class="list-title">Aanya Kapoor</span><span class="status-pill status-pending">Pending</span></div>
+            <div class="card-meta" style="margin-bottom:8px;">Performer &middot; proof of work submitted</div>
+            <div class="card-actions"><div class="btn-primary">Approve</div><div class="btn-ghost">Reject</div></div>
+          </div>
+          <div class="list-card">
+            <div class="list-top"><span class="list-title">The Wren Cafe</span><span class="status-pill status-pending">Pending</span></div>
+            <div class="card-meta" style="margin-bottom:8px;">Venue &middot; business proof submitted</div>
+            <div class="card-actions"><div class="btn-primary">Approve</div><div class="btn-ghost">Reject</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMS AND CONDITIONS -->
+  <div class="frame-wrap">
+    <div class="frame-label">Terms and conditions</div>
+    <div class="phone">
+      <div class="island"></div>
+      <div class="screen">
+        <div class="topbar"><span class="back">&#8592;</span><span class="title" style="font-size:16px;">Terms</span><span></span></div>
+        <div class="content">
+          <div class="section-label">Platform rules</div>
+          <div class="bio-text" style="text-align:left;padding:0;margin-bottom:10px;">Placeholder text describing platform rules and user responsibilities.</div>
+          <div class="section-label">Verification</div>
+          <div class="bio-text" style="text-align:left;padding:0;margin-bottom:10px;">Placeholder text describing verification requirements for performers and venues.</div>
+          <div class="section-label">Bookings and conduct</div>
+          <div class="bio-text" style="text-align:left;padding:0;margin-bottom:16px;">Placeholder text describing booking conduct and cancellation expectations.</div>
+          <div class="checkbox-row"><div class="checkbox"></div>I agree to the terms and conditions</div>
+          <div class="btn-primary btn-block" style="margin-top:10px;">Continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
