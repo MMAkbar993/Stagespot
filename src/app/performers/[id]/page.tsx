@@ -109,7 +109,10 @@ export default async function PerformerProfilePage({
       <div className="sm:grid sm:grid-cols-[280px_1fr] sm:gap-10">
         <div className="sm:sticky sm:top-24 sm:self-start">
           <div className="pt-2 text-center sm:pt-0">
-            <div className="mx-auto mb-2.5 h-19 w-19 rounded-full border-4 border-surface bg-linear-to-br from-[#D9C3A0] to-accent shadow-[0_0_0_1px_var(--color-line)] sm:h-24 sm:w-24" />
+            <div
+              className="mx-auto mb-2.5 h-19 w-19 rounded-full border-4 border-surface bg-linear-to-br from-[#D9C3A0] to-accent bg-cover bg-center shadow-[0_0_0_1px_var(--color-line)] sm:h-24 sm:w-24"
+              style={profile.profile_picture_url ? { backgroundImage: `url(${profile.profile_picture_url})` } : undefined}
+            />
             <div className="text-base font-semibold text-ink sm:text-lg">
               {profile.display_name}
             </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FieldLabel, FieldInput, CheckboxRow } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
+import { ProfilePictureUpload } from "@/components/forms/ProfilePictureUpload";
 import type { VenueProfile } from "@/lib/types";
 
 export function VenueProfileForm({
@@ -20,6 +21,7 @@ export function VenueProfileForm({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pictureUrl, setPictureUrl] = useState(initialValues?.profile_picture_url ?? null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -47,6 +49,7 @@ export function VenueProfileForm({
         social_link: form.get("social_link"),
         first_time_hosting: form.get("first_time_hosting") === "on",
         proof_of_business_link: form.get("proof_of_business_link"),
+        profile_picture_url: pictureUrl,
       }),
     });
 
@@ -62,6 +65,7 @@ export function VenueProfileForm({
 
   return (
     <form onSubmit={handleSubmit}>
+      <ProfilePictureUpload currentUrl={pictureUrl} onUploaded={setPictureUrl} />
       <FieldLabel>Venue name</FieldLabel>
       <FieldInput
         name="venue_name"

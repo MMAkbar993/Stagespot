@@ -11,6 +11,7 @@ type Body = {
   social_link?: string;
   first_time_hosting?: boolean;
   proof_of_business_link?: string;
+  profile_picture_url?: string | null;
 };
 
 export async function POST(request: Request) {
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
     proof_of_business_links: body.proof_of_business_link
       ? [{ url: body.proof_of_business_link }]
       : [],
+    profile_picture_url: body.profile_picture_url ?? null,
     ...(location && {
       lat: location.lat,
       lng: location.lng,

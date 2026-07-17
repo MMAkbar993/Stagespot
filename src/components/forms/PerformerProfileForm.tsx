@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { FieldLabel, FieldInput, FieldTextarea, CheckboxRow } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
+import { ProfilePictureUpload } from "@/components/forms/ProfilePictureUpload";
 import type { PerformerProfile } from "@/lib/types";
 
 export function PerformerProfileForm({
@@ -21,6 +22,7 @@ export function PerformerProfileForm({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pictureUrl, setPictureUrl] = useState(initialValues?.profile_picture_url ?? null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,6 +57,7 @@ export function PerformerProfileForm({
       portfolio_links: portfolioLink ? [{ url: portfolioLink }] : [],
       first_time_flag: form.get("first_time_flag") === "on",
       proof_of_work_links: proofLink ? [{ url: proofLink }] : [],
+      profile_picture_url: pictureUrl,
     };
 
     const { error } =
@@ -73,7 +76,7 @@ export function PerformerProfileForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="mx-auto mb-2 h-15 w-15 rounded-full bg-linear-to-br from-[#D9C3A0] to-accent" />
+      <ProfilePictureUpload currentUrl={pictureUrl} onUploaded={setPictureUrl} />
       <FieldLabel>Name</FieldLabel>
       <FieldInput name="display_name" placeholder="Your name" defaultValue={initialValues?.display_name} required />
       <FieldLabel>Act type</FieldLabel>

@@ -1,0 +1,65 @@
+[
+  {
+    "name": "The Wren Cafe",
+    "full_address": "14 MG Road, near Metro Gate 3",
+    "locality": "Connaught Place",
+    "city": "Delhi",
+    "state": "Delhi",
+    "act_types_wanted": ["music", "poetry"],
+    "notes": "example row, verified in person"
+  },
+  {
+    "name": "Unplugged Courtyard",
+    "full_address": "L Block 23/7, Ground Floor, Middle Circle, near Odeon Cinema, Connaught Place, New Delhi 110001",
+    "locality": "Connaught Place",
+    "city": "Delhi",
+    "state": "Delhi",
+    "act_types_wanted": ["music"],
+    "notes": "real venue, known for live band performances, address from public listings, confirm current status before adding"
+  },
+  {
+    "name": "Depot48",
+    "full_address": "Second Floor, M9 M Block Market, Greater Kailash II, New Delhi",
+    "locality": "Greater Kailash II",
+    "city": "Delhi",
+    "state": "Delhi",
+    "act_types_wanted": ["music"],
+    "notes": "real venue, long-running independent live music venue, regularly hosts open mics, address from public listings"
+  },
+  {
+    "name": "Light Room",
+    "full_address": "Second Floor, 12A Hauz Khas Tank, Hauz Khas Village, Deer Park, New Delhi 110016",
+    "locality": "Hauz Khas Village",
+    "city": "Delhi",
+    "state": "Delhi",
+    "act_types_wanted": ["comedy"],
+    "notes": "real venue, hosts recurring comedy open mic nights, address from public event listings"
+  },
+  {
+    "name": "The Piano Man Jazz Club",
+    "full_address": "B 6-7/22, Safdarjung Enclave Market, Opp Deer Park, New Delhi 110029",
+    "locality": "Safdarjung Enclave",
+    "city": "Delhi",
+    "state": "Delhi",
+    "act_types_wanted": ["music"],
+    "notes": "real venue, jazz and live music club, has hosted open mic nights, address from public listings"
+  },
+  {
+    "name": "Buddy On Stage",
+    "full_address": "L-11 Basement, Malviya Nagar, New Delhi 110017",
+    "locality": "Malviya Nagar",
+    "city": "Delhi",
+    "state": "Delhi",
+    "act_types_wanted": ["music", "poetry", "comedy", "storytelling"],
+    "notes": "real venue, dedicated weekly multi-genre open mic space, explicitly beginner-friendly, address from public listings"
+  },
+  {
+    "name": "The Social House",
+    "full_address": "Near Tilak Nagar metro station, Tilak Nagar, New Delhi",
+    "locality": "Tilak Nagar",
+    "city": "Delhi",
+    "state": "Delhi",
+    "act_types_wanted": ["poetry", "comedy"],
+    "notes": "real venue, known for weekly poetry and comedy open mics, exact street address not confirmed, verify before adding"
+  }
+]

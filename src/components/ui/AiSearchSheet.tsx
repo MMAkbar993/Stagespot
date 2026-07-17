@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "./Button";
 import { FieldTextarea } from "./Field";
+import { createClient } from "@/lib/supabase/client";
+
+type MatchedPerformer = { id: string; display_name: string; act_type: string | null };
 
 export function AiSearchSheet({
   open,
@@ -13,12 +17,14 @@ export function AiSearchSheet({
 }) {
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [matches, setMatches] = useState<MatchedPerformer[] | null>(null);
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
 
   async function handleSuggest() {
     setLoading(true);
+    setMatches(null);
     try {
       const res = await fetch("/api/ai-search", {
         method: "POST",
@@ -27,6 +33,27 @@ export function AiSearchSheet({
       });
       const data = await res.json();
       setTags(data.tags ?? []);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleShowMatches() {
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const orFilter = tags
+        .map((tag) => `act_type.ilike.%${tag}%,bio.ilike.%${tag}%`)
+        .join(",");
+      const { data } = await supabase
+        .from("performer_profiles")
+        .select("user_id, display_name, act_type")
+        .eq("verification_status", "approved")
+        .or(orFilter)
+        .limit(10);
+      setMatches(
+        (data ?? []).map((p) => ({ id: p.user_id, display_name: p.display_name, act_type: p.act_type })),
+      );
     } finally {
       setLoading(false);
     }
@@ -66,14 +93,35 @@ export function AiSearchSheet({
             ))}
           </div>
         )}
+
+        {matches && (
+          <div className="mt-3 space-y-1.5">
+            {matches.length === 0 ? (
+              <p className="text-xs text-ink-2">No matching performers found.</p>
+            ) : (
+              matches.map((p) => (
+                <Link
+                  key={p.id}
+                  href={`/performers/${p.id}`}
+                  onClick={onClose}
+                  className="block rounded-lg border border-line px-3 py-2 text-xs text-ink hover:bg-canvas"
+                >
+                  <span className="font-semibold">{p.display_name}</span>
+                  {p.act_type && <span className="text-ink-2"> · {p.act_type}</span>}
+                </Link>
+              ))
+            )}
+          </div>
+        )}
+
         <Button
           block
           variant="primary"
           className="mt-4"
           disabled={!description || loading}
-          onClick={handleSuggest}
+          onClick={tags.length > 0 ? handleShowMatches : handleSuggest}
         >
-          {loading ? "Thinking…" : "Show matching performers"}
+          {loading ? "Thinking…" : tags.length > 0 ? "Show matching performers" : "Suggest tags"}
         </Button>
       </div>
     </div>

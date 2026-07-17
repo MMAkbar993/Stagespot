@@ -1,11 +1,20 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { requireAdmin } from "@/lib/auth/guards";
-import { VerificationQueueList, type QueueItem } from "@/components/admin/VerificationQueueList";
+import type { QueueItem } from "@/components/admin/VerificationQueueList";
+import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { getAllGigsForAdmin, getAllBookingsForAdmin, getAllReviewsForAdmin } from "@/lib/data/admin";
 
 export default async function AdminDashboardPage() {
   const { supabase } = await requireAdmin();
 
-  const [{ data: pendingPerformers }, { data: pendingVenues }, { count: activeGigs }] = await Promise.all([
+  const [
+    { data: pendingPerformers },
+    { data: pendingVenues },
+    { count: activeGigsCount },
+    gigs,
+    bookings,
+    reviews,
+  ] = await Promise.all([
     supabase
       .from("performer_profiles")
       .select("user_id, display_name, proof_of_work_links")
@@ -15,6 +24,9 @@ export default async function AdminDashboardPage() {
       .select("user_id, venue_name, proof_of_business_links")
       .eq("verification_status", "pending"),
     supabase.from("gigs").select("id", { count: "exact", head: true }).eq("status", "open"),
+    getAllGigsForAdmin(supabase),
+    getAllBookingsForAdmin(supabase),
+    getAllReviewsForAdmin(supabase),
   ]);
 
   const queue: QueueItem[] = [
@@ -34,21 +46,13 @@ export default async function AdminDashboardPage() {
 
   return (
     <AppShell title="Admin">
-      <div className="mb-4 grid grid-cols-2 gap-2.5 sm:max-w-md">
-        <div className="rounded-xl border border-line bg-surface p-3">
-          <div className="text-lg font-bold text-ink">{queue.length}</div>
-          <div className="text-[10px] text-ink-2">pending</div>
-        </div>
-        <div className="rounded-xl border border-line bg-surface p-3">
-          <div className="text-lg font-bold text-ink">{activeGigs ?? 0}</div>
-          <div className="text-[10px] text-ink-2">active gigs</div>
-        </div>
-      </div>
-
-      <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-2">
-        Verification queue
-      </div>
-      <VerificationQueueList items={queue} />
+      <AdminDashboard
+        queue={queue}
+        gigs={gigs}
+        bookings={bookings}
+        reviews={reviews}
+        activeGigsCount={activeGigsCount ?? 0}
+      />
     </AppShell>
   );
 }

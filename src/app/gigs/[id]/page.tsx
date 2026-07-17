@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { getOptionalUser } from "@/lib/auth/guards";
 import { RequestToPerformButton } from "@/components/bookings/RequestToPerformButton";
+import { GigOwnerActions } from "@/components/gigs/GigOwnerActions";
 import type { BookingStatus } from "@/lib/types";
 
 type GigRow = {
@@ -99,7 +100,7 @@ export default async function GigDetailPage({
         )}
 
         {isOwner ? (
-          <p className="text-sm text-ink-2">This is your gig.</p>
+          <GigOwnerActions gigId={gig.id} status={gig.status} />
         ) : role === "performer" ? (
           <RequestToPerformButton
             gigId={gig.id}
