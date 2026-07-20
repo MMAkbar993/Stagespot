@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FieldLabel, FieldInput, CheckboxRow } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { ProfilePictureUpload } from "@/components/forms/ProfilePictureUpload";
+import { VenuePhotosUpload } from "@/components/forms/VenuePhotosUpload";
 import type { VenueProfile } from "@/lib/types";
 
 export function VenueProfileForm({
@@ -22,6 +23,11 @@ export function VenueProfileForm({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pictureUrl, setPictureUrl] = useState(initialValues?.profile_picture_url ?? null);
+  const [photoUrls, setPhotoUrls] = useState<(string | null)[]>([
+    initialValues?.photos?.[0]?.url ?? null,
+    initialValues?.photos?.[1]?.url ?? null,
+    initialValues?.photos?.[2]?.url ?? null,
+  ]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,9 +39,7 @@ export function VenueProfileForm({
     setLoading(true);
 
     const form = new FormData(formEl);
-    const photos = ["photo_1", "photo_2", "photo_3"]
-      .map((name) => form.get(name) as string)
-      .filter(Boolean);
+    const photos = photoUrls.filter((url): url is string => Boolean(url));
 
     const res = await fetch("/api/venue-profile", {
       method: "POST",
@@ -86,12 +90,8 @@ export function VenueProfileForm({
         placeholder="Music / comedy / poetry / other"
         defaultValue={initialValues?.act_types_wanted?.[0]}
       />
-      <FieldLabel>Venue photo links</FieldLabel>
-      <div className="space-y-1.5">
-        <FieldInput name="photo_1" placeholder="Link to a photo" defaultValue={initialValues?.photos?.[0]?.url} />
-        <FieldInput name="photo_2" placeholder="Link to a photo" defaultValue={initialValues?.photos?.[1]?.url} />
-        <FieldInput name="photo_3" placeholder="Link to a photo" defaultValue={initialValues?.photos?.[2]?.url} />
-      </div>
+      <FieldLabel>Venue photos</FieldLabel>
+      <VenuePhotosUpload currentUrls={photoUrls} onChange={setPhotoUrls} />
       <FieldLabel>Social media link</FieldLabel>
       <FieldInput
         name="social_link"

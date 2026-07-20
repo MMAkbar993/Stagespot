@@ -3,6 +3,7 @@ import { VerifiedBadge, Badge } from "@/components/ui/Badge";
 import { StatRow } from "@/components/ui/Stat";
 import { ReviewCard } from "@/components/ui/ReviewCard";
 import { InvitePerformerButton, type InviteGigOption } from "@/components/bookings/InvitePerformerButton";
+import { ProfileReviewActions } from "@/components/admin/ProfileReviewActions";
 import { getOptionalUser } from "@/lib/auth/guards";
 import type { PerformerProfile } from "@/lib/types";
 
@@ -38,6 +39,8 @@ export default async function PerformerProfilePage({
   }
 
   const isOwner = user?.id === profile.user_id;
+  const isAdmin = role === "admin";
+  const canSeeProof = isOwner || isAdmin;
 
   const [{ data: ratingData }, { count: performancesCount }, { data: recent }, { data: reviews }, { data: bookingsForCount }] =
     await Promise.all([
@@ -121,11 +124,17 @@ export default async function PerformerProfilePage({
             </div>
             <div className="mb-3 flex flex-wrap justify-center gap-1.5">
               {profile.verification_status === "approved" && <VerifiedBadge />}
-              {profile.verification_status === "pending" && isOwner && (
+              {profile.verification_status === "pending" && canSeeProof && (
                 <Badge variant="pending">Pending verification</Badge>
+              )}
+              {profile.verification_status === "rejected" && canSeeProof && (
+                <Badge variant="rejected">Rejected</Badge>
               )}
               {alreadyWorkedWith && <Badge variant="accent">Already worked with</Badge>}
             </div>
+            {profile.verification_status === "rejected" && canSeeProof && profile.rejection_reason && (
+              <p className="mb-3 text-xs text-red-600">{profile.rejection_reason}</p>
+            )}
           </div>
           <StatRow
             stats={[
@@ -170,6 +179,33 @@ export default async function PerformerProfilePage({
               ))}
             </div>
           )}
+          {canSeeProof && profile.proof_of_work_links?.length > 0 && (
+            <div className="mt-4">
+              <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-2">
+                Proof of work
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {profile.proof_of_work_links.map((link, i) => (
+                  <a
+                    key={i}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-line px-3 py-1.5 text-xs text-ink-2 hover:text-ink"
+                  >
+                    Link {i + 1}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isAdmin && profile.verification_status === "pending" && (
+            <div className="mt-4">
+              <ProfileReviewActions profileType="performer" profileId={profile.user_id} />
+            </div>
+          )}
+
           {role === "venue" && !isOwner && profile.verification_status === "approved" && (
             <div className="mt-4">
               <InvitePerformerButton performerId={id} venueId={user!.id} gigs={inviteGigs} />

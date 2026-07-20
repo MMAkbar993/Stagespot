@@ -48,18 +48,26 @@ export async function getApprovedPerformers(supabase: AnySupabaseClient, limit =
 
   const rows = data ?? [];
 
-  const ratings = await Promise.all(
-    rows.map((r) => supabase.rpc("avg_rating", { target_user_id: r.user_id })),
+  // Bulk RPC instead of one avg_rating() call per row — up to 50 sequential
+  // round trips otherwise, the dominant cost on this page.
+  const { data: ratingRows } = await supabase.rpc("avg_ratings_bulk", {
+    user_ids: rows.map((r) => r.user_id),
+  });
+  const ratingByUserId = new Map(
+    ((ratingRows ?? []) as { user_id: string; avg_rating: number | null }[]).map((r) => [
+      r.user_id,
+      r.avg_rating,
+    ]),
   );
 
-  return rows.map((r, i) => ({
+  return rows.map((r) => ({
     id: r.user_id,
     display_name: r.display_name,
     act_type: r.act_type,
     bio: r.bio,
     first_time_flag: r.first_time_flag,
     created_at: r.created_at,
-    rating: ratings[i]?.data ? Number(ratings[i].data) : null,
+    rating: ratingByUserId.get(r.user_id) ? Number(ratingByUserId.get(r.user_id)) : null,
     lat: r.lat,
     lng: r.lng,
   }));

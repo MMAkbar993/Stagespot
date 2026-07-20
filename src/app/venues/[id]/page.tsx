@@ -2,6 +2,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { VerifiedBadge, Badge } from "@/components/ui/Badge";
 import { StatRow } from "@/components/ui/Stat";
 import { ReviewCard } from "@/components/ui/ReviewCard";
+import { ProfileReviewActions } from "@/components/admin/ProfileReviewActions";
 import { getOptionalUser } from "@/lib/auth/guards";
 import type { VenueProfile } from "@/lib/types";
 
@@ -18,7 +19,7 @@ export default async function VenueProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { supabase, user } = await getOptionalUser();
+  const { supabase, user, role } = await getOptionalUser();
 
   const { data: venue } = await supabase
     .from("venue_profiles")
@@ -37,6 +38,8 @@ export default async function VenueProfilePage({
   }
 
   const isOwner = user?.id === venue.user_id;
+  const isAdmin = role === "admin";
+  const canSeeProof = isOwner || isAdmin;
 
   const [{ data: ratingData }, { count: gigsCount }, { data: pastGigs }, { data: reviews }, { data: bookingsForCount }] =
     await Promise.all([
@@ -100,11 +103,17 @@ export default async function VenueProfilePage({
             </div>
             <div className="mb-3 flex flex-wrap justify-center gap-1.5">
               {venue.verification_status === "approved" && <VerifiedBadge />}
-              {venue.verification_status === "pending" && isOwner && (
+              {venue.verification_status === "pending" && canSeeProof && (
                 <Badge variant="pending">Pending verification</Badge>
+              )}
+              {venue.verification_status === "rejected" && canSeeProof && (
+                <Badge variant="rejected">Rejected</Badge>
               )}
               {alreadyWorkedWith && <Badge variant="accent">Already worked with</Badge>}
             </div>
+            {venue.verification_status === "rejected" && canSeeProof && venue.rejection_reason && (
+              <p className="mb-3 text-xs text-red-600">{venue.rejection_reason}</p>
+            )}
           </div>
           <StatRow
             stats={[
@@ -138,6 +147,33 @@ export default async function VenueProfilePage({
                   {key}
                 </a>
               ))}
+            </div>
+          )}
+
+          {canSeeProof && venue.proof_of_business_links?.length > 0 && (
+            <div className="mt-4">
+              <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-2">
+                Proof of business
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {venue.proof_of_business_links.map((link, i) => (
+                  <a
+                    key={i}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-line px-3 py-1.5 text-xs text-ink-2 hover:text-ink"
+                  >
+                    Link {i + 1}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isAdmin && venue.verification_status === "pending" && (
+            <div className="mt-4">
+              <ProfileReviewActions profileType="venue" profileId={venue.user_id} />
             </div>
           )}
         </div>

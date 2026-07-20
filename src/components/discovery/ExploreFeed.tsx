@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { FieldSelect } from "@/components/ui/Field";
+import { FieldSelect, FieldInput } from "@/components/ui/Field";
 import { MasonryGrid, MasonryCard } from "@/components/ui/MasonryGrid";
 import { haversineDistanceKm, formatDistanceKm } from "@/lib/distance";
 import type { DiscoveryPerformer, DiscoveryGig } from "@/lib/data/discovery";
@@ -42,6 +42,7 @@ export function ExploreFeed({
   const [category, setCategory] = useState("all");
   const [maxDistance, setMaxDistance] = useState("any");
   const [sort, setSort] = useState("newest");
+  const [search, setSearch] = useState("");
 
   // Distance only means something for the "natural" pairing: a performer
   // browsing gigs (distance to the venue), or a venue browsing performers
@@ -70,6 +71,10 @@ export function ExploreFeed({
 
   const filteredPerformers = useMemo(() => {
     let list = performersWithDistance;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter((p) => p.display_name.toLowerCase().includes(q));
+    }
     if (category !== "all") list = list.filter((p) => p.act_type === category);
     if (distanceRelevant && maxDistance !== "any") {
       const max = Number(maxDistance);
@@ -81,10 +86,14 @@ export function ExploreFeed({
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
     return list;
-  }, [performersWithDistance, category, sort, distanceRelevant, maxDistance]);
+  }, [performersWithDistance, category, sort, distanceRelevant, maxDistance, search]);
 
   const filteredGigs = useMemo(() => {
     let list = gigsWithDistance;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter((g) => g.venue_name.toLowerCase().includes(q));
+    }
     if (category !== "all") list = list.filter((g) => g.act_types_wanted.includes(category));
     if (distanceRelevant && maxDistance !== "any") {
       const max = Number(maxDistance);
@@ -96,7 +105,7 @@ export function ExploreFeed({
       return new Date(a.event_date).getTime() - new Date(b.event_date).getTime();
     });
     return list;
-  }, [gigsWithDistance, category, sort, distanceRelevant, maxDistance]);
+  }, [gigsWithDistance, category, sort, distanceRelevant, maxDistance, search]);
 
   function switchFilter(next: "performers" | "gigs") {
     setFilter(next);
@@ -121,6 +130,12 @@ export function ExploreFeed({
       </div>
 
       <div className="mb-2 flex flex-wrap gap-2">
+        <FieldInput
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={filter === "performers" ? "Search performers by name" : "Search venues by name"}
+          className="w-full sm:w-56"
+        />
         {categories.length > 0 && (
           <FieldSelect value={category} onChange={(e) => setCategory(e.target.value)} className="w-auto">
             <option value="all">All categories</option>
