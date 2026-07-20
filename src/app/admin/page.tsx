@@ -1,11 +1,16 @@
 import { AppShell } from "@/components/layout/AppShell";
-import { requireAdmin } from "@/lib/auth/guards";
+import { getOptionalUser } from "@/lib/auth/guards";
+import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
 import type { QueueItem } from "@/components/admin/VerificationQueueList";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { getAllGigsForAdmin, getAllBookingsForAdmin, getAllReviewsForAdmin } from "@/lib/data/admin";
 
 export default async function AdminDashboardPage() {
-  const { supabase } = await requireAdmin();
+  const { supabase, user, role } = await getOptionalUser();
+
+  if (!user || role !== "admin") {
+    return <AdminLoginForm deniedRole={user ? (role ?? undefined) : undefined} />;
+  }
 
   const [
     { data: pendingPerformers },
