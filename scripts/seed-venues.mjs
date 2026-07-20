@@ -79,7 +79,6 @@ async function insertVenueProfile(userId, venue, location) {
     body: JSON.stringify({
       user_id: userId,
       venue_name: venue.name,
-      address: venue.full_address,
       locality: venue.locality,
       city: venue.city,
       state: venue.state,
@@ -90,6 +89,17 @@ async function insertVenueProfile(userId, venue, location) {
     }),
   });
   if (!res.ok) throw new Error(`Failed to insert venue_profiles for ${venue.name}: ${await res.text()}`);
+
+  // The exact address lives in its own table so it stays hidden until a
+  // booking is confirmed (Section 5.6) — see migration 0007.
+  const addressRes = await fetch(`${SUPABASE_URL}/rest/v1/venue_private_details`, {
+    method: "POST",
+    headers: { ...headers, Prefer: "return=minimal" },
+    body: JSON.stringify({ user_id: userId, address: venue.full_address }),
+  });
+  if (!addressRes.ok) {
+    throw new Error(`Failed to insert venue_private_details for ${venue.name}: ${await addressRes.text()}`);
+  }
 }
 
 async function main() {

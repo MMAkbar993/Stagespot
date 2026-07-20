@@ -43,16 +43,25 @@ export default async function GigDetailPage({
 
   const isOwner = user?.id === gig.venue_id;
   let existingBookingStatus: BookingStatus | null = null;
+  let performerApproved = false;
 
   if (user && role === "performer" && !isOwner) {
-    const { data: existing } = await supabase
-      .from("bookings")
-      .select("status")
-      .eq("gig_id", gig.id)
-      .eq("performer_id", user.id)
-      .in("status", ["requested", "accepted", "confirmed", "completed"])
-      .maybeSingle<{ status: BookingStatus }>();
+    const [{ data: existing }, { data: performerProfile }] = await Promise.all([
+      supabase
+        .from("bookings")
+        .select("status")
+        .eq("gig_id", gig.id)
+        .eq("performer_id", user.id)
+        .in("status", ["requested", "accepted", "confirmed", "completed"])
+        .maybeSingle<{ status: BookingStatus }>(),
+      supabase
+        .from("performer_profiles")
+        .select("verification_status")
+        .eq("user_id", user.id)
+        .maybeSingle<{ verification_status: string }>(),
+    ]);
     existingBookingStatus = existing?.status ?? null;
+    performerApproved = performerProfile?.verification_status === "approved";
   }
 
   const location = [gig.venue_profiles?.locality, gig.venue_profiles?.city].filter(Boolean).join(", ");
@@ -102,12 +111,19 @@ export default async function GigDetailPage({
         {isOwner ? (
           <GigOwnerActions gigId={gig.id} status={gig.status} />
         ) : role === "performer" ? (
-          <RequestToPerformButton
-            gigId={gig.id}
-            venueId={gig.venue_id}
-            scheduledDate={gig.event_date}
-            initialStatus={existingBookingStatus}
-          />
+          performerApproved || existingBookingStatus ? (
+            <RequestToPerformButton
+              gigId={gig.id}
+              venueId={gig.venue_id}
+              scheduledDate={gig.event_date}
+              initialStatus={existingBookingStatus}
+            />
+          ) : (
+            <p className="text-sm text-ink-2">
+              Your performer profile needs to be verified by an admin before you can request to
+              perform.
+            </p>
+          )
         ) : (
           <p className="text-sm text-ink-2">
             {user ? "Only performers can request to perform." : "Log in as a performer to request this gig."}

@@ -4,15 +4,35 @@ import { EntryToggle } from "@/components/marketing/EntryToggle";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { StatMini } from "@/components/ui/Stat";
 import { MasonryGrid, MasonryCard } from "@/components/ui/MasonryGrid";
-import { mockPerformers, mockVenues } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/server";
+import { getApprovedPerformers, getOpenGigs } from "@/lib/data/discovery";
 
-export default function LandingPage() {
+const IMAGE_HEIGHTS = [100, 140, 120, 105];
+
+export default async function LandingPage() {
+  const supabase = await createClient();
+
+  const [performers, gigs, { count: performerCount }, { count: venueCount }] = await Promise.all([
+    getApprovedPerformers(supabase, 2),
+    getOpenGigs(supabase, 2),
+    supabase.from("performer_profiles").select("user_id", { count: "exact", head: true }).eq("verification_status", "approved"),
+    supabase.from("venue_profiles").select("user_id", { count: "exact", head: true }).eq("verification_status", "approved"),
+  ]);
+
   const nearby = [
-    { name: mockVenues[0].name, chip: mockVenues[0].chip, height: 100 },
-    { name: mockPerformers[2].name, chip: "poetry", height: 140 },
-    { name: mockVenues[1].name, chip: mockVenues[1].chip, height: 120 },
-    { name: mockPerformers[0].name, chip: "acoustic", height: 100 },
-  ];
+    ...gigs.map((g) => ({
+      key: `gig-${g.id}`,
+      href: `/gigs/${g.id}`,
+      name: g.venue_name,
+      chip: new Date(g.event_date).toLocaleDateString(undefined, { weekday: "short", hour: "numeric" }),
+    })),
+    ...performers.map((p) => ({
+      key: `performer-${p.id}`,
+      href: `/performers/${p.id}`,
+      name: p.display_name,
+      chip: p.act_type ?? "performer",
+    })),
+  ].slice(0, 4);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -36,8 +56,8 @@ export default function LandingPage() {
             <EntryToggle />
           </div>
           <div className="mt-5 flex max-w-sm gap-3">
-            <StatMini value="120+" label="verified acts" />
-            <StatMini value="40+" label="venues" />
+            <StatMini value={`${performerCount ?? 0}+`} label="verified acts" />
+            <StatMini value={`${venueCount ?? 0}+`} label="venues" />
           </div>
         </div>
 
@@ -45,17 +65,21 @@ export default function LandingPage() {
           <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-2">
             This week nearby
           </div>
-          <MasonryGrid>
-            {nearby.map((item) => (
-              <MasonryCard
-                key={item.name}
-                href="/login"
-                imageHeight={item.height}
-                name={item.name}
-                chip={item.chip}
-              />
-            ))}
-          </MasonryGrid>
+          {nearby.length === 0 ? (
+            <p className="text-sm text-ink-2">New listings appear here as venues and performers join.</p>
+          ) : (
+            <MasonryGrid>
+              {nearby.map((item, i) => (
+                <MasonryCard
+                  key={item.key}
+                  href={item.href}
+                  imageHeight={IMAGE_HEIGHTS[i % IMAGE_HEIGHTS.length]}
+                  name={item.name}
+                  chip={item.chip}
+                />
+              ))}
+            </MasonryGrid>
+          )}
         </div>
       </section>
 

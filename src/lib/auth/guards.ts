@@ -43,6 +43,18 @@ export async function requireProfile() {
 
   if (!profile) redirect(`/onboarding/${role}`);
 
+  // address lives in venue_private_details now (Section 5.6 address privacy) —
+  // merge it in here so the rest of the app can keep treating `profile` as
+  // the single source of truth for the owner's own view.
+  if (role === "venue") {
+    const { data: privateDetails } = await supabase
+      .from("venue_private_details")
+      .select("address")
+      .eq("user_id", user.id)
+      .maybeSingle<{ address: string }>();
+    (profile as VenueProfile).address = privateDetails?.address;
+  }
+
   return { supabase, user, role, profile };
 }
 

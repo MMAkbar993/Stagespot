@@ -8,6 +8,8 @@ export type DiscoveryPerformer = {
   first_time_flag: boolean | null;
   created_at: string;
   rating: number | null;
+  lat: number | null;
+  lng: number | null;
 };
 
 export type DiscoveryGig = {
@@ -20,24 +22,31 @@ export type DiscoveryGig = {
   time_window: string | null;
   act_types_wanted: string[];
   created_at: string;
+  lat: number | null;
+  lng: number | null;
+};
+
+type PerformerRow = {
+  user_id: string;
+  display_name: string;
+  act_type: string | null;
+  bio: string | null;
+  first_time_flag: boolean | null;
+  created_at: string;
+  lat: number | null;
+  lng: number | null;
 };
 
 export async function getApprovedPerformers(supabase: AnySupabaseClient, limit = 50): Promise<DiscoveryPerformer[]> {
   const { data } = await supabase
     .from("performer_profiles")
-    .select("user_id, display_name, act_type, bio, first_time_flag, created_at")
+    .select("user_id, display_name, act_type, bio, first_time_flag, created_at, lat, lng")
     .eq("verification_status", "approved")
     .order("created_at", { ascending: false })
-    .limit(limit);
+    .limit(limit)
+    .returns<PerformerRow[]>();
 
-  const rows = (data ?? []) as {
-    user_id: string;
-    display_name: string;
-    act_type: string | null;
-    bio: string | null;
-    first_time_flag: boolean | null;
-    created_at: string;
-  }[];
+  const rows = data ?? [];
 
   const ratings = await Promise.all(
     rows.map((r) => supabase.rpc("avg_rating", { target_user_id: r.user_id })),
@@ -51,6 +60,8 @@ export async function getApprovedPerformers(supabase: AnySupabaseClient, limit =
     first_time_flag: r.first_time_flag,
     created_at: r.created_at,
     rating: ratings[i]?.data ? Number(ratings[i].data) : null,
+    lat: r.lat,
+    lng: r.lng,
   }));
 }
 
@@ -61,14 +72,20 @@ type GigWithVenue = {
   time_window: string | null;
   act_types_wanted: string[];
   created_at: string;
-  venue_profiles: { venue_name: string; locality: string | null; city: string | null } | null;
+  venue_profiles: {
+    venue_name: string;
+    locality: string | null;
+    city: string | null;
+    lat: number | null;
+    lng: number | null;
+  } | null;
 };
 
 export async function getOpenGigs(supabase: AnySupabaseClient, limit = 50): Promise<DiscoveryGig[]> {
   const { data } = await supabase
     .from("gigs")
     .select(
-      "id, venue_id, event_date, time_window, act_types_wanted, created_at, venue_profiles(venue_name, locality, city)",
+      "id, venue_id, event_date, time_window, act_types_wanted, created_at, venue_profiles(venue_name, locality, city, lat, lng)",
     )
     .eq("status", "open")
     .order("event_date", { ascending: true })
@@ -87,5 +104,7 @@ export async function getOpenGigs(supabase: AnySupabaseClient, limit = 50): Prom
     time_window: g.time_window,
     act_types_wanted: g.act_types_wanted ?? [],
     created_at: g.created_at,
+    lat: g.venue_profiles?.lat ?? null,
+    lng: g.venue_profiles?.lng ?? null,
   }));
 }

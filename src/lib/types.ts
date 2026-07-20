@@ -27,6 +27,13 @@ export type PerformerProfile = {
   first_time_flag: boolean | null;
   proof_of_work_links: LinkItem[];
   profile_picture_url: string | null;
+  // General area only, for distance-based matching — never a physical
+  // destination, so unlike a venue's address this is always public.
+  locality: string | null;
+  city: string | null;
+  state: string | null;
+  lat: number | null;
+  lng: number | null;
   verification_status: VerificationStatus;
   rejection_reason: string | null;
   created_at: string;
@@ -36,7 +43,10 @@ export type PerformerProfile = {
 export type VenueProfile = {
   user_id: string;
   venue_name: string;
-  address: string;
+  // Lives in venue_private_details, not the venue_profiles table — merged
+  // in for the owner (requireProfile) or via get_booking_reveal once a
+  // booking is confirmed. Never present for a public/other-party view.
+  address?: string;
   state: string | null;
   city: string | null;
   locality: string | null;

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { FieldLabel, FieldInput, FieldTextarea, CheckboxRow } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { ProfilePictureUpload } from "@/components/forms/ProfilePictureUpload";
@@ -26,48 +25,34 @@ export function PerformerProfileForm({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // e.currentTarget goes null after the first await (React nulls out
-    // SyntheticEvent fields once the synchronous dispatch phase ends), so
-    // capture the form here before any awaited call.
+    // e.currentTarget goes null after the first await, so capture it now.
     const formEl = e.currentTarget;
     setError(null);
     setLoading(true);
 
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setLoading(false);
-      setError("You must be logged in.");
-      return;
-    }
-
     const form = new FormData(formEl);
-    const socialLink = form.get("social_link") as string;
-    const portfolioLink = form.get("portfolio_link") as string;
-    const proofLink = form.get("proof_of_work_link") as string;
 
-    const payload = {
-      display_name: form.get("display_name"),
-      act_type: form.get("act_type") || null,
-      bio: form.get("bio") || null,
-      social_links: socialLink ? { primary: socialLink } : {},
-      portfolio_links: portfolioLink ? [{ url: portfolioLink }] : [],
-      first_time_flag: form.get("first_time_flag") === "on",
-      proof_of_work_links: proofLink ? [{ url: proofLink }] : [],
-      profile_picture_url: pictureUrl,
-    };
-
-    const { error } =
-      mode === "edit"
-        ? await supabase.from("performer_profiles").update(payload).eq("user_id", user.id)
-        : await supabase.from("performer_profiles").insert({ user_id: user.id, ...payload });
+    const res = await fetch("/api/performer-profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mode,
+        display_name: form.get("display_name"),
+        act_type: form.get("act_type"),
+        bio: form.get("bio"),
+        social_link: form.get("social_link"),
+        portfolio_link: form.get("portfolio_link"),
+        first_time_flag: form.get("first_time_flag") === "on",
+        proof_of_work_link: form.get("proof_of_work_link"),
+        profile_picture_url: pictureUrl,
+        area: form.get("area"),
+      }),
+    });
 
     setLoading(false);
-    if (error) {
-      setError(error.message);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Something went wrong.");
       return;
     }
     router.push(redirectTo);
@@ -87,6 +72,12 @@ export function PerformerProfileForm({
       />
       <FieldLabel>Bio</FieldLabel>
       <FieldTextarea name="bio" rows={3} placeholder="Short bio" defaultValue={initialValues?.bio ?? undefined} />
+      <FieldLabel>Your area</FieldLabel>
+      <FieldInput
+        name="area"
+        placeholder="Locality or neighborhood, city"
+        defaultValue={initialValues?.locality ?? undefined}
+      />
       <FieldLabel>Social media link</FieldLabel>
       <FieldInput
         name="social_link"
