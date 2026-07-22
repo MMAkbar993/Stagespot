@@ -20,7 +20,7 @@
 
 - Node.js 20+
 - A Supabase project (free tier is sufficient)
-- An Anthropic API key, for the AI-assisted search feature ([console.anthropic.com](https://console.anthropic.com/settings/keys))
+- A Gemini API key, for the AI-assisted search feature ([aistudio.google.com/apikey](https://aistudio.google.com/apikey))
 
 ## Installation and Setup
 
@@ -59,7 +59,7 @@ See `.env.example` for the full list with inline comments. Summary:
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Project Settings → API Keys → Project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Same page → publishable key (safe for the browser, respects Row Level Security) |
 | `SUPABASE_SECRET_KEY` | Same page → secret key (server-only — bypasses RLS, never expose to the client) |
-| `ANTHROPIC_API_KEY` | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) — powers AI-assisted search |
+| `GEMINI_API_KEY` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) — powers AI-assisted search |
 | `NEXT_PUBLIC_SITE_URL` | Base URL of the deployed app (defaults to `http://localhost:3000` for local dev) |
 
 ## Folder and Project Structure
